@@ -36,7 +36,6 @@ Request Body:
 ```
 Response:
 ```json
-Copy code
 [
   {"size": 5000},
   {"size": 5000},
