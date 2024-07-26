@@ -26,15 +26,13 @@ go mod tidy
       ]
   }
 ```
-5. 
-Running the Application
+4. Running the Application
 Start the application by running:
 
 ```sh
 cd cmd
 go build .
 ```
-
 
 ## API
 Calculate Packs (v1)
