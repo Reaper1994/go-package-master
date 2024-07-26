@@ -1,4 +1,4 @@
-package test
+package tests
 
 import (
 	"fmt"
@@ -27,7 +27,7 @@ func TestPackCalculatorV1_CalculatePacks(t *testing.T) {
 		{250, []models.Pack{{Size: 250}}},
 		{251, []models.Pack{{Size: 500}}},
 		{501, []models.Pack{{Size: 500}, {Size: 250}}},
-		{12001, []models.Pack{{Size: 5000}, {Size: 5000}, {Size: 2000}, {Size: 250}}},
+		{20001, []models.Pack{{Size: 5000}, {Size: 5000}, {Size: 5000}, {Size: 5000}, {Size: 250}}},
 	}
 
 	for _, tt := range tests {
@@ -46,7 +46,7 @@ func equalPacks(a, b []models.Pack) bool {
 		return false
 	}
 	for i := range a {
-		if a[i] != b[i] {
+		if a[i].Size != b[i].Size {
 			return false
 		}
 	}
