@@ -12,103 +12,68 @@ type PackCalculatorV1 struct {
 
 // CalculatePacks calculates the optimal combination of packs.
 func (pc *PackCalculatorV1) CalculatePacks(order models.Order) []models.Pack {
-	// Helper functions
-	contains := func(packs []models.Pack, value int) bool {
-		for _, pack := range packs {
-			if pack.Size == value {
-				return true
+	// Sort packs in descending order to prioritize larger packs first
+	sort.Slice(pc.Packs, func(i, j int) bool {
+		return pc.Packs[i].Size > pc.Packs[j].Size
+	})
+
+	remaining := order.Items
+	var res []models.Pack
+
+	for remaining > 0 {
+		packAdded := false
+
+		// Try to use the largest pack that is less than or equal to the remaining items
+		for _, pack := range pc.Packs {
+			if remaining >= pack.Size {
+				res = append(res, pack)
+				remaining -= pack.Size
+				packAdded = true
+				break
 			}
 		}
-		return false
-	}
-
-	orderAsc := func(packs []models.Pack) []int {
-		sizes := make([]int, len(packs))
-		for i, pack := range packs {
-			sizes[i] = pack.Size
+		if packAdded {
+			continue
 		}
-		sort.Ints(sizes)
-		return sizes
-	}
 
-	findLowAndHighNearestToValue := func(packs []int, value int) (int, int) {
-		low, high := -1, -1
-		for _, pack := range packs {
-			if pack <= value {
-				low = pack
-			}
-			if pack >= value && high == -1 {
-				high = pack
-			}
+		// If no pack was added, use the smallest available pack to handle the remaining items
+		if remaining > 0 {
+			smallestPack := pc.Packs[len(pc.Packs)-1]
+			res = append(res, smallestPack)
+			remaining -= smallestPack.Size
 		}
-		return low, high
 	}
 
-	sum := func(packs []models.Pack) int {
-		total := 0
-		for _, pack := range packs {
-			total += pack.Size
-		}
-		return total
-	}
+	// Optimization: Consolidate results to avoid unnecessary packs
+	res = optimizePacks(res, pc.Packs)
 
-	getNearestValue := func(value int, packs []models.Pack) int {
-		sizes := orderAsc(packs)
-		_, high := findLowAndHighNearestToValue(sizes, value)
-		return high
-	}
+	return res
+}
 
-	mapResults := func(packs []models.Pack) []models.Pack {
-		return packs
-	}
+// optimizePacks ensures that the final result has the minimal number of packs
+func optimizePacks(packs []models.Pack, availablePacks []models.Pack) []models.Pack {
+	sort.Slice(packs, func(i, j int) bool {
+		return packs[i].Size > packs[j].Size
+	})
 
-	var calculatePacksFromRequestedItems func(int, []models.Pack, []models.Pack) []models.Pack
-	calculatePacksFromRequestedItems = func(itemsOrdered int, packs []models.Pack, res []models.Pack) []models.Pack {
-		if contains(packs, itemsOrdered) {
-			return mapResults(append(res, models.Pack{Size: itemsOrdered}))
-		} else {
-			remaining := itemsOrdered
-			originalItemsOrdered := itemsOrdered
-
-			if len(res) > 0 {
-				temp := make([]int, len(packs))
-				for i, pack := range packs {
-					temp[i] = pack.Size
-				}
-				lowValue, highValue := findLowAndHighNearestToValue(orderAsc(packs), remaining)
-				if remaining >= lowValue && remaining <= highValue {
-					res = append(res, models.Pack{Size: highValue})
-					remaining -= highValue
-				} else if remaining >= lowValue {
-					res = append(res, models.Pack{Size: lowValue})
-					remaining -= lowValue
-				}
+	for i := 0; i < len(packs); i++ {
+		for j := i + 1; j < len(packs); j++ {
+			if packs[i].Size == packs[j].Size {
+				continue
 			}
-
-			if remaining > 0 {
-				for _, pack := range packs {
-					if remaining >= pack.Size {
-						res = append(res, pack)
-						remaining -= pack.Size
-						return calculatePacksFromRequestedItems(remaining, packs, res)
+			if packs[i].Size > packs[j].Size {
+				remaining := packs[i].Size - packs[j].Size
+				for _, pack := range availablePacks {
+					if remaining == pack.Size {
+						packs[i] = pack
+						packs = append(packs[:j], packs[j+1:]...)
+						i = -1
+						break
 					}
 				}
-				var smallestPack = packs[len(packs)-1]
-				if remaining < smallestPack.Size {
-					res = append(res, smallestPack)
-				}
-			}
-
-			// Perform validation to ensure we are sending out the smallest number of packs
-			sumResults := sum(res)
-			if contains(packs, sumResults) {
-				res = []models.Pack{{Size: sumResults}}
-			} else if nearest := getNearestValue(originalItemsOrdered, packs); nearest < sumResults && nearest > originalItemsOrdered {
-				res = []models.Pack{{Size: nearest}}
 			}
 		}
-		return mapResults(res)
 	}
 
-	return calculatePacksFromRequestedItems(order.Items, pc.Packs, []models.Pack{})
+	return packs
 }
