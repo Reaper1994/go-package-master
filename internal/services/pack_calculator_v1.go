@@ -32,12 +32,9 @@ func (pc *PackCalculatorV1) CalculatePacks(order models.Order) []models.Pack {
 				break
 			}
 		}
-		if packAdded {
-			continue
-		}
 
 		// If no pack was added, use the smallest available pack to handle the remaining items
-		if remaining > 0 {
+		if !packAdded {
 			smallestPack := pc.Packs[len(pc.Packs)-1]
 			res = append(res, smallestPack)
 			remaining -= smallestPack.Size
@@ -52,28 +49,34 @@ func (pc *PackCalculatorV1) CalculatePacks(order models.Order) []models.Pack {
 
 // optimizePacks ensures that the final result has the minimal number of packs
 func optimizePacks(packs []models.Pack, availablePacks []models.Pack) []models.Pack {
-	sort.Slice(packs, func(i, j int) bool {
-		return packs[i].Size > packs[j].Size
-	})
 
-	for i := 0; i < len(packs); i++ {
-		for j := i + 1; j < len(packs); j++ {
-			if packs[i].Size == packs[j].Size {
-				continue
-			}
-			if packs[i].Size > packs[j].Size {
-				remaining := packs[i].Size - packs[j].Size
-				for _, pack := range availablePacks {
-					if remaining == pack.Size {
-						packs[i] = pack
+	for {
+		consolidated := false
+		sort.Slice(packs, func(i, j int) bool {
+			return packs[i].Size > packs[j].Size
+		})
+		for i := 0; i < len(packs)-1; i++ {
+			for j := i + 1; j < len(packs); j++ {
+				combinedSize := packs[i].Size + packs[j].Size
+				for _, availablePack := range availablePacks {
+					if combinedSize == availablePack.Size {
+						packs[i] = availablePack
 						packs = append(packs[:j], packs[j+1:]...)
-						i = -1
+						consolidated = true
 						break
 					}
 				}
+				if consolidated {
+					break
+				}
+			}
+			if consolidated {
+				break
 			}
 		}
+		if !consolidated {
+			break
+		}
 	}
-
 	return packs
 }
