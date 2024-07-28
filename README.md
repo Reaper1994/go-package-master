@@ -34,7 +34,6 @@ cd cmd
 go build .
 ```
 
-
 ## API
 Calculate Packs (v1)
 URL: /api/v1/calculate
