@@ -14,11 +14,24 @@ go mod tidy
 ```
 
 3. Update the config.json file if necessary to adjust pack sizes.
-Running the Application
+   sample config.json
+```json
+  {
+      "packs": [
+          { "size": 250 },
+          { "size": 500 },
+          { "size": 1000 },
+          { "size": 2000 },
+          { "size": 5000 }
+      ]
+  }
+```
+4. Running the Application
 Start the application by running:
 
 ```sh
-go run main.go
+cd cmd
+go build .
 ```
 
 
@@ -47,7 +60,8 @@ Testing
 Run unit and feature tests using:
 
 ```sh
-go test ./...
+cd tests
+go test .
 ```
 
 ## Example
