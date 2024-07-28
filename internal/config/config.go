@@ -1,26 +1,30 @@
 package config
 
 import (
-    "encoding/json"
-    "os"
-    "github.com/Reaper1994/go-package-master/internal/models"
+	"encoding/json"
+	"io/ioutil"
+	"os"
 )
 
-// Config represents the application configuration.
 type Config struct {
-    Packs []models.Pack `json:"packs"`
+	Packs []struct {
+		Size int `json:"size"`
+	} `json:"packs"`
 }
 
-// LoadConfig loads configuration from a file.
-func LoadConfig(filepath string) (Config, error) {
-    file, err := os.Open(filepath)
-    if err != nil {
-        return Config{}, err
-    }
-    defer file.Close()
+func LoadConfig(file string) (Config, error) {
+	var config Config
+	configFile, err := os.Open(file)
+	if err != nil {
+		return config, err
+	}
+	defer configFile.Close()
 
-    var config Config
-    decoder := json.NewDecoder(file)
-    err = decoder.Decode(&config)
-    return config, err
+	byteValue, err := ioutil.ReadAll(configFile)
+	if err != nil {
+		return config, err
+	}
+
+	err = json.Unmarshal(byteValue, &config)
+	return config, err
 }
