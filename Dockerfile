@@ -1,30 +1,35 @@
-# Use the official Golang image to create a build artifact.
-FROM golang:1.18 AS builder
+# Use the official Golang image with Alpine Linux as the base image for building the application.
+# Alpine Linux provides a smaller footprint compared to the standard Golang image.
+FROM golang:1.22.5-alpine
 
-# Set the Current Working Directory inside the container
+# Set the working directory inside the container to /app.
+# All subsequent commands will be run from this directory.
 WORKDIR /app
 
-# Copy go mod and sum files
-COPY go.mod .
-COPY go.sum .
+# Initialize a new Go module.
+# These files lock the versions of dependencies and are used by go mod tidy to fetch the exact versions.
+RUN go mod init github.com/Reaper1994/go-package-master
 
-# Download all dependencies
-RUN go mod download
+# Run go mod tidy to download the exact versions of dependencies specified in go.mod and go.sum.
+# This step cleans up the go.mod and go.sum files by removing unused modules.
+RUN go mod tidy
 
-# Copy the rest of your application's source code
+# Copy the rest of the application code into the container.
+# This includes your Go source files, tests, and any other resources your application needs.
 COPY . .
 
-# Build the application
+# Compile the Go application into a binary named "main".
+# The ./main.go argument specifies the entry point of your application.
 RUN go build -o main cmd/main.go
 
-# Start a new stage from scratch
-FROM alpine:latest
-
-# Copy the binary file from the builder stage
-COPY --from=builder /app/main .
-
-# Make the "main" binary executable
+# Make the "main" binary executable.
+# This step is necessary because the binary is built without executable permissions by default.
 RUN chmod +x main
 
-# Command to run the executable
-CMD ["./main"]
+# Inform Docker that the container listens on the specified network ports at runtime.
+# Here, port 4040 is exposed, but make sure your application actually listens on this port.
+EXPOSE 4040
+
+# Specify the command to run your application.
+# This command is executed when the container starts.
+CMD [ "./main" ]
