@@ -1,11 +1,10 @@
+
 package main
 
 import (
-	"flag"
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/Reaper1994/go-package-master/internal/config"
 	v1 "github.com/Reaper1994/go-package-master/internal/handlers/v1"
@@ -14,37 +13,7 @@ import (
 	"github.com/Reaper1994/go-package-master/internal/services"
 )
 
-const (
-	Port = 8080
-)
-
-var enableTreblle = flag.Bool("enable-treblle", true, "Enable Treblle integration")
-
-func initializeMiddleware(enableTreblleMiddleware bool) http.Handler {
-	// Initialize pack calculators for each version
-	calculatorV1 := services.PackCalculatorV1{}
-
-	// Handlers for each version.
-	handlerV1 := &v1.CalculateHandlerV1{Calculator: calculatorV1}
-
-	var treblleHandler http.Handler
-
-	if enableTreblleMiddleware {
-		treblleAPIKey := os.Getenv("TREBLLE_API_KEY")
-		treblleProjectID := os.Getenv("TREBLLE_PROJECT_ID")
-
-		treblleHandler = middleware.TreblleMiddleware(treblleAPIKey, treblleProjectID, handlerV1)
-	}
-
-	// Apply custom middleware
-	finalHandler := middleware.LoggingMiddleware(middleware.RecoveryMiddleware(treblleHandler))
-
-	return finalHandler
-}
-
 func main() {
-	flag.Parse()
-
 	cfg, err := config.LoadConfig("config.json")
 	if err != nil {
 		log.Fatalf("Error loading config: %v", err)
@@ -56,8 +25,15 @@ func main() {
 		packs = append(packs, models.Pack{Size: p.Size})
 	}
 
-	http.Handle("/api/v1/calculate", initializeMiddleware(*enableTreblle))
+	// Initialize pack calculators for each version
+	calculatorV1 := services.PackCalculatorV1{Packs: packs}
 
-	fmt.Printf("PackMaster server is running on port %d\n", Port)
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", Port), nil))
+	// Handlers for each version
+	handlerV1 := &v1.CalculateHandlerV1{Calculator: calculatorV1}
+
+	// Set up routes with middleware
+	http.Handle("/api/v1/calculate", middleware.LoggingMiddleware(middleware.RecoveryMiddleware(handlerV1)))
+
+	fmt.Println("PackMaster server is running on port 8080")
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
