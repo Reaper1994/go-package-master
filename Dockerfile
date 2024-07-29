@@ -13,6 +13,7 @@ RUN go mod init github.com/Reaper1994/go-package-master
 # Run go mod tidy to download the exact versions of dependencies specified in go.mod and go.sum.
 # This step cleans up the go.mod and go.sum files by removing unused modules.
 RUN go mod tidy
+RUN go mod download
 
 # Copy the rest of the application code into the container.
 # This includes your Go source files, tests, and any other resources your application needs.
