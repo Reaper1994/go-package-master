@@ -20,7 +20,7 @@ COPY . .
 
 # Compile the Go application into a binary named "main".
 # The ./main.go argument specifies the entry point of your application.
-RUN go build -o main /cmd/main.go
+RUN go build -o main cmd/main.go
 
 # Make the "main" binary executable.
 # This step is necessary because the binary is built without executable permissions by default.
