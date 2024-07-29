@@ -18,7 +18,7 @@ const (
 	Port = 8080
 )
 
-var enableTreblle = flag.Bool("enable-treblle", false, "Enable Treblle integration")
+var enableTreblle = flag.Bool("enable-treblle", true, "Enable Treblle integration")
 
 func initializeMiddleware(enableTreblleMiddleware bool) http.Handler {
 	// Initialize pack calculators for each version
@@ -34,10 +34,6 @@ func initializeMiddleware(enableTreblleMiddleware bool) http.Handler {
 		treblleProjectID := os.Getenv("TREBLLE_PROJECT_ID")
 
 		treblleHandler = middleware.TreblleMiddleware(treblleAPIKey, treblleProjectID, handlerV1)
-	} else {
-		treblleHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			http.Error(w, "Treblle integration is disabled.", http.StatusForbidden)
-		})
 	}
 
 	// Apply custom middleware
