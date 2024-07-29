@@ -27,8 +27,8 @@ RUN go build -o main cmd/main.go
 RUN chmod +x main
 
 # Inform Docker that the container listens on the specified network ports at runtime.
-# Here, port 4040 is exposed, but make sure your application actually listens on this port.
-EXPOSE 4040
+# Here, port 8080 is exposed, but make sure your application actually listens on this port.
+EXPOSE 8080
 
 # Specify the command to run your application.
 # This command is executed when the container starts.
