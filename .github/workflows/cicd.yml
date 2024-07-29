@@ -1,0 +1,26 @@
+name: Test Docker Build Workflow
+
+on:
+  push:
+    branches:
+      - feature/workflow-api-ops
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.22.5'
+
+      - name: Install Dependencies
+        run: go mod download
+
+      - name: Run Tests
+        run: |
+          cd tests
+          go test -v || exit 1
