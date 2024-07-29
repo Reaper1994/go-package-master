@@ -30,7 +30,7 @@ func RecoveryMiddleware(next http.Handler) http.Handler {
 // TreblleMiddleware wraps the given handler with Treblle middleware.
 func TreblleMiddleware(apiKey, projectId string, next http.Handler) http.Handler {
     if apiKey == "" || projectId == "" {
-        fmt.Println("Treblle API key or project ID is missing.")
+        log.Fatalf("Treblle API key or project ID is missing.")
     }
 
     treblle.Configure(treblle.Configuration{
