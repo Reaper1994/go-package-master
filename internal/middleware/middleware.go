@@ -3,6 +3,8 @@ package middleware
 import (
 	"log"
 	"net/http"
+
+	"github.com/treblle/treblle-go"
 )
 
 // LoggingMiddleware logs each incoming request.
@@ -23,4 +25,18 @@ func RecoveryMiddleware(next http.Handler) http.Handler {
 		}()
 		next.ServeHTTP(w, r)
 	})
+}
+
+// TreblleMiddleware wraps the given handler with Treblle middleware.
+func TreblleMiddleware(apiKey, projectId string, next http.Handler) http.Handler {
+    if apiKey == "" || projectId == "" {
+        log.Fatalf("Treblle API key or project ID is missing.")
+    }
+
+    treblle.Configure(treblle.Configuration{
+        APIKey:    apiKey,
+        ProjectID: projectId,
+    })
+
+    return treblle.Middleware(next)
 }
