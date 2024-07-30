@@ -16,15 +16,19 @@ type CalculateHandlerV1 struct {
 
 // ServeHTTP processes the request and responds with the calculated packs.
 func (h *CalculateHandlerV1) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-
 	var order models.Order
 
+	if err := json.NewDecoder(r.Body).Decode(&order); err != nil {
+		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+		return
+	}
+
     // Check Accept header
-        acceptHeader := r.Header.Get("Accept")
-        if !strings.Contains(acceptHeader, "application/json") {
-            http.Error(w, "Unsupported Media Type", http.StatusUnsupportedMediaType)
-            return
-        }
+    acceptHeader := r.Header.Get("Accept")
+    if !strings.Contains(acceptHeader, "application/json") {
+        http.Error(w, "Unsupported Media Type", http.StatusUnsupportedMediaType)
+        return
+    }
 
 	packs := h.Calculator.CalculatePacks(order)
 
