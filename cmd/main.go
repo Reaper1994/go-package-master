@@ -1,10 +1,10 @@
-
 package main
 
 import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/Reaper1994/go-package-master/internal/config"
 	v1 "github.com/Reaper1994/go-package-master/internal/handlers/v1"
@@ -12,6 +12,24 @@ import (
 	"github.com/Reaper1994/go-package-master/internal/models"
 	"github.com/Reaper1994/go-package-master/internal/services"
 )
+
+const Port = 8080
+
+func initializeMiddleware(handler http.Handler) http.Handler {
+
+	treblleAPIKey := os.Getenv("TREBLLE_API_KEY")
+	treblleProjectID := os.Getenv("TREBLLE_PROJECT_ID")
+
+	fmt.Printf("PackMaster server is running on port %s\n", os.Getenv("TREBLLE_API_KEY"))
+	fmt.Printf("PackMaster server is running on port %s\n", os.Getenv("TREBLLE_PROJECT_ID"))
+
+	handler = middleware.TreblleMiddleware(treblleAPIKey, treblleProjectID, handler)
+	handler = middleware.LoggingMiddleware(handler)
+	handler = middleware.RecoveryMiddleware(handler)
+
+
+	return handler
+}
 
 func main() {
 	cfg, err := config.LoadConfig("config.json")
@@ -32,8 +50,8 @@ func main() {
 	handlerV1 := &v1.CalculateHandlerV1{Calculator: calculatorV1}
 
 	// Set up routes with middleware
-	http.Handle("/api/v1/calculate", middleware.LoggingMiddleware(middleware.RecoveryMiddleware(handlerV1)))
+	http.Handle("/api/v1/calculate", initializeMiddleware(handlerV1))
 
-	fmt.Println("PackMaster server is running on port 8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	fmt.Printf("PackMaster server is running on port %d\n", Port)
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", Port), nil)) //logs every request
 }
