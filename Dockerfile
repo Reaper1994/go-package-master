@@ -30,6 +30,12 @@ RUN chmod +x main
 # Here, port 8080 is exposed, but make sure your application actually listens on this port.
 EXPOSE 8080
 
+# OPTIONAL: Set environment variables for Treblle API keys
+# These environment variables are used in your Go application to configure Treblle for API ops.
+# Set default environment variables (can be overridden by CI/CD secrets or runtime configuration)
+ENV TREBLLE_API_KEY=default_key
+ENV TREBLLE_PROJECT_ID=default_project_id
+
 # Specify the command to run your application.
 # This command is executed when the container starts.
 CMD [ "./main" ]
