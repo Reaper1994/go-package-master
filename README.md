@@ -81,8 +81,18 @@ Expected response:
 ]
 ```
 
-## Contributing
-Contributions are welcome! Please open an issue or submit a pull request for any improvements or bug fixes.
+## Considerations
+
+- **Treblle SDK Integration:**  
+  The project is integrated with the Treblle SDK for API operations, for API ops. Detailed instructions for setting up the Treblle SDK can be found in the `Dockerfile`.
+
+- **Versioned Endpoints:**  
+  Endpoints have been versioned to ensure backward compatibility and support for future enhancements etc.
+
+- **GitHub Actions for CI/CD:**  
+  The project uses GitHub Actions to automate testing, building, and deploying the Docker image to Docker Hub. This ensures a streamlined and reliable deployment process.
+
+For more details on configuration and setup, please refer to the relevant sections in the `Dockerfile` and GitHub Actions workflow.
 
 License
 MIT
