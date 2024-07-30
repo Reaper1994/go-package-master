@@ -20,13 +20,12 @@ func initializeMiddleware(handler http.Handler) http.Handler {
 	treblleAPIKey := os.Getenv("TREBLLE_API_KEY")
 	treblleProjectID := os.Getenv("TREBLLE_PROJECT_ID")
 
-	fmt.Printf("PackMaster server is running on port %s\n", os.Getenv("TREBLLE_API_KEY"))
-	fmt.Printf("PackMaster server is running on port %s\n", os.Getenv("TREBLLE_PROJECT_ID"))
+	fmt.Printf("TREBLLE_API_KEY %s\n", os.Getenv("TREBLLE_API_KEY"))
+	fmt.Printf("TREBLLE_PROJECT_ID on port %s\n", os.Getenv("TREBLLE_PROJECT_ID"))
 
 	handler = middleware.TreblleMiddleware(treblleAPIKey, treblleProjectID, handler)
 	handler = middleware.LoggingMiddleware(handler)
 	handler = middleware.RecoveryMiddleware(handler)
-
 
 	return handler
 }
