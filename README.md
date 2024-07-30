@@ -67,7 +67,11 @@ go test .
 To test the API, you can use curl:
 
 ```sh
-curl -X POST http://localhost:8080/api/v1/calculate -d '{"items": 12001}' -H "Content-Type: application/json"
+curl -X POST http://localhost:8080/api/v1/calculate \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json" \
+  -d '{"items": 12001}'
+
 ```
 
 Expected response:
