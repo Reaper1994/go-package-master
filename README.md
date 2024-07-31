@@ -31,7 +31,6 @@ Start the application by running:
 
 ```sh
 cd cmd
-go mod tidy
 go build .
 ```
 
