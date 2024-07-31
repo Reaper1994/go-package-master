@@ -1,5 +1,5 @@
 # go-package-master
-A modular Go application that calculates the optimal combination of packs to fulfil customer orders.
+A modular Go application that calculates the optimal combination of packs to fulfil customer orders for Gymshark 🦈.
 
 ## Installation
 
@@ -31,6 +31,7 @@ Start the application by running:
 
 ```sh
 cd cmd
+go mod tidy
 go build .
 ```
 
@@ -86,17 +87,15 @@ Expected response:
 ```
 
 ## Considerations
-
-- **Treblle SDK Integration:**  
-  The project is integrated with the Treblle SDK for API operations, for API ops. Detailed instructions for setting up the Treblle SDK can be found in the `Dockerfile`.
-
 - **Versioned Endpoints:**  
   Endpoints have been versioned to ensure backward compatibility and support for future enhancements etc.
+
+- **Treblle SDK Integration:**  
+ The project is integrated with the Treblle SDK for API operations and for API ops.  For more details on the configuration and setup of the Treblle SDK, please refer to the relevant sections in the `Dockerfile` and GitHub Actions workflow..
 
 - **GitHub Actions for CI/CD:**  
   The project uses GitHub Actions to automate testing, building, and deploying the Docker image to Docker Hub. This ensures a streamlined and reliable deployment process.
 
-For more details on configuration and setup, please refer to the relevant sections in the `Dockerfile` and GitHub Actions workflow.
 
 License
 MIT
