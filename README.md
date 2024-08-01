@@ -70,8 +70,10 @@ To test the API, you can use curl:
 curl -X POST http://localhost:8080/api/v1/calculate \
   -H "Content-Type: application/json" \
   -H "Accept: application/json" \
+  -H "Authorization: Bearer GSLC-123-0R" \ 
   -d '{"items": 12001}'
 
+// Note: the authorization  token is somethig that ive kept as a cosntant for now with  value as shown above
 ```
 
 Expected response:
