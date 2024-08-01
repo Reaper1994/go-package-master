@@ -8,7 +8,7 @@ import (
 
 	"github.com/Reaper1994/go-package-master/internal/config"
 	v1 "github.com/Reaper1994/go-package-master/internal/handlers/v1"
-	"github.com/Reaper1994/go-package-master/internal/middleware"
+	"github.com/Reaper1994/go-package-master/internal/middlewares"
 	"github.com/Reaper1994/go-package-master/internal/models"
 	"github.com/Reaper1994/go-package-master/internal/services"
 )
@@ -24,10 +24,10 @@ func initializeMiddleware(handler http.Handler) http.Handler {
 	fmt.Printf("TREBLLE_API_KEY %s\n", os.Getenv("TREBLLE_API_KEY"))
 	fmt.Printf("TREBLLE_PROJECT_ID on port %s\n", os.Getenv("TREBLLE_PROJECT_ID"))
 
-	handler = middleware.TreblleMiddleware(treblleAPIKey, treblleProjectID, handler)
-	handler = middleware.LoggingMiddleware(handler)
-	handler = middleware.RecoveryMiddleware(handler)
-	handler = middleware.AuthorizationMiddleware(handler)
+	handler = middlewares.TreblleMiddleware(treblleAPIKey, treblleProjectID, handler)
+	handler = middlewares.LoggingMiddleware(handler)
+	handler = middlewares.RecoveryMiddleware(handler)
+	handler = middlewares.AuthorizationMiddleware(handler)
 
 	return handler
 }
@@ -50,7 +50,7 @@ func main() {
 	// Handlers for each version
 	handlerV1 := &v1.CalculateHandlerV1{Calculator: calculatorV1}
 
-	// Set up routes with middleware
+	// Set up routes with middlewares
 	http.Handle("/api/v1/calculate", initializeMiddleware(handlerV1))
 
 	fmt.Printf("PackMaster server is running on port %d\n", Port)
