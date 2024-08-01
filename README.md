@@ -73,7 +73,7 @@ curl -X POST http://localhost:8080/api/v1/calculate \
   -H "Authorization: Bearer GSLC-123-0R" \ 
   -d '{"items": 12001}'
 
-// Note: the authorization  token is somethig that ive kept as a cosntant for now with  value as shown above
+// Note: the authorization  token is something that ive kept as a constant for now with  value as shown above
 ```
 
 Expected response:
