@@ -98,3 +98,27 @@ func equalPacks(a, b []models.Pack) bool {
 	}
 	return true
 }
+
+// TestPackCalculatorV1_CalculatePacks_Invalid tests handling of invalid order amounts
+func TestPackCalculatorV1_CalculatePacks_Invalid(t *testing.T) {
+	// Testing with order amount 0
+	orderZero := models.Order{Items: 0}
+	expectedPacksZero := []models.Pack{}
+
+	packsZero := calculator.CalculatePacks(orderZero)
+	if !equalPacks(packsZero, expectedPacksZero) {
+		t.Errorf("Expected packs %v, but got %v for order amount 0", expectedPacksZero, packsZero)
+	} else {
+		t.Log("TestPackCalculatorV1_CalculatePacks_Invalid (0 items): Success")
+	}
+
+	orderNegative := models.Order{Items: -1}
+	expectedPacksNegative := []models.Pack{}
+
+	packsNegative := calculator.CalculatePacks(orderNegative)
+	if !equalPacks(packsNegative, expectedPacksNegative) {
+		t.Errorf("Expected packs %v, but got %v for negative order amount", expectedPacksNegative, packsNegative)
+	} else {
+		t.Log("TestPackCalculatorV1_CalculatePacks_Invalid (negative items): Success")
+	}
+}
