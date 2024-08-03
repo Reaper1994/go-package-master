@@ -7,6 +7,8 @@ import (
 	"github.com/Reaper1994/go-package-master/internal/config"
 	"github.com/Reaper1994/go-package-master/internal/models"
 	"github.com/Reaper1994/go-package-master/internal/services"
+	"github.com/Reaper1994/go-package-master/internal/transformers"
+	"github.com/stretchr/testify/assert"
 )
 
 var calculator services.PackCalculatorV1
@@ -29,96 +31,68 @@ func init() {
 
 func TestPackCalculatorV1_CalculatePacks_1(t *testing.T) {
 	order := models.Order{Items: 1}
-	expectedPacks := []models.Pack{{Size: 250}}
+	expectedJSON := `{"250":1}`
 
 	packs := calculator.CalculatePacks(order)
-	if !equalPacks(packs, expectedPacks) {
-		t.Errorf("Expected packs %v, but got %v", expectedPacks, packs)
-	} else {
-		t.Log("TestPackCalculatorV1_CalculatePacks_1: Success")
-	}
+	result := transformers.FormatPacks(packs)
+
+	assert.JSONEq(t, expectedJSON, result, "Expected packs %s, but got %s", expectedJSON, result)
 }
 
 func TestPackCalculatorV1_CalculatePacks_250(t *testing.T) {
 	order := models.Order{Items: 250}
-	expectedPacks := []models.Pack{{Size: 250}}
+	expectedJSON := `{"250":1}`
 
 	packs := calculator.CalculatePacks(order)
-	if !equalPacks(packs, expectedPacks) {
-		t.Errorf("Expected packs %v, but got %v", expectedPacks, packs)
-	} else {
-		t.Log("TestPackCalculatorV1_CalculatePacks_250: Success")
-	}
+	result := transformers.FormatPacks(packs)
+
+	assert.JSONEq(t, expectedJSON, result, "Expected packs %s, but got %s", expectedJSON, result)
 }
 
 func TestPackCalculatorV1_CalculatePacks_251(t *testing.T) {
 	order := models.Order{Items: 251}
-	expectedPacks := []models.Pack{{Size: 500}}
+	expectedJSON := `{"500":1}`
 
 	packs := calculator.CalculatePacks(order)
-	if !equalPacks(packs, expectedPacks) {
-		t.Errorf("Expected packs %v, but got %v", expectedPacks, packs)
-	} else {
-		t.Log("TestPackCalculatorV1_CalculatePacks_251: Success")
-	}
+	result := transformers.FormatPacks(packs)
+
+	assert.JSONEq(t, expectedJSON, result, "Expected packs %s, but got %s", expectedJSON, result)
 }
 
 func TestPackCalculatorV1_CalculatePacks_501(t *testing.T) {
 	order := models.Order{Items: 501}
-	expectedPacks := []models.Pack{{Size: 500}, {Size: 250}}
+	expectedJSON := `{"500":1,"250":1}`
 
 	packs := calculator.CalculatePacks(order)
-	if !equalPacks(packs, expectedPacks) {
-		t.Errorf("Expected packs %v, but got %v", expectedPacks, packs)
-	} else {
-		t.Log("TestPackCalculatorV1_CalculatePacks_501: Success")
-	}
+	result := transformers.FormatPacks(packs)
+
+	assert.JSONEq(t, expectedJSON, result, "Expected packs %s, but got %s", expectedJSON, result)
 }
 
 func TestPackCalculatorV1_CalculatePacks_12001(t *testing.T) {
 	order := models.Order{Items: 12001}
-	expectedPacks := []models.Pack{{Size: 5000}, {Size: 5000}, {Size: 2000}, {Size: 250}}
+	expectedJSON := `{"5000":2,"2000":1,"250":1}`
 
 	packs := calculator.CalculatePacks(order)
-	if !equalPacks(packs, expectedPacks) {
-		t.Errorf("Expected packs %v, but got %v", expectedPacks, packs)
-	} else {
-		t.Log("TestPackCalculatorV1_CalculatePacks_12001: Success")
-	}
+	result := transformers.FormatPacks(packs)
+
+	assert.JSONEq(t, expectedJSON, result, "Expected packs %s, but got %s", expectedJSON, result)
 }
 
-func equalPacks(a, b []models.Pack) bool {
-	if len(a) != len(b) {
-		return false
-	}
-	for i := range a {
-		if a[i].Size != b[i].Size {
-			return false
-		}
-	}
-	return true
-}
-
-// TestPackCalculatorV1_CalculatePacks_Invalid tests handling of invalid order amounts
 func TestPackCalculatorV1_CalculatePacks_Invalid(t *testing.T) {
 	// Testing with order amount 0
 	orderZero := models.Order{Items: 0}
-	expectedPacksZero := []models.Pack{}
+	expectedJSONZero := `{}`
 
 	packsZero := calculator.CalculatePacks(orderZero)
-	if !equalPacks(packsZero, expectedPacksZero) {
-		t.Errorf("Expected packs %v, but got %v for order amount 0", expectedPacksZero, packsZero)
-	} else {
-		t.Log("TestPackCalculatorV1_CalculatePacks_Invalid (0 items): Success")
-	}
+	resultZero := transformers.FormatPacks(packsZero)
+	assert.JSONEq(t, expectedJSONZero, resultZero, "Expected packs %s, but got %s for order amount 0", expectedJSONZero, resultZero)
 
+	// Testing with negative order amount
 	orderNegative := models.Order{Items: -1}
-	expectedPacksNegative := []models.Pack{}
+	expectedJSONNegative := `{}`
 
 	packsNegative := calculator.CalculatePacks(orderNegative)
-	if !equalPacks(packsNegative, expectedPacksNegative) {
-		t.Errorf("Expected packs %v, but got %v for negative order amount", expectedPacksNegative, packsNegative)
-	} else {
-		t.Log("TestPackCalculatorV1_CalculatePacks_Invalid (negative items): Success")
-	}
+	resultNegative := transformers.FormatPacks(packsNegative)
+	assert.JSONEq(t, expectedJSONNegative, resultNegative, "Expected packs %s, but got %s for negative order amount", expectedJSONNegative, resultNegative)
 }
