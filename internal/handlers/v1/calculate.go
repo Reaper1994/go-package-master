@@ -7,6 +7,7 @@ import (
 
 	"github.com/Reaper1994/go-package-master/internal/models"
 	"github.com/Reaper1994/go-package-master/internal/services"
+	"github.com/Reaper1994/go-package-master/internal/transformers"
 )
 
 // CalculateHandlerV1 handles requests to calculate pack combinations for API v1.
@@ -37,6 +38,7 @@ func (h *CalculateHandlerV1) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	packs := h.Calculator.CalculatePacks(order)
+	formattedPacks := transformers.FormatPacks(packs) // formats the packs to give a count of each pack
 
 	// Set security headers
 	w.Header().Set("X-Frame-Options", "DENY")
@@ -46,7 +48,7 @@ func (h *CalculateHandlerV1) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Allow", "POST")
 	w.Header().Set("Content-Type", "application/json")
 
-	if err := json.NewEncoder(w).Encode(packs); err != nil {
+	if err := json.NewEncoder(w).Encode(formattedPacks); err != nil {
 		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
 	}
 }
