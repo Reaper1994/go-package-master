@@ -40,6 +40,13 @@ func (h *CalculateHandlerV1) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	packs := h.Calculator.CalculatePacks(order)
 	formattedPacks := transformers.FormatPacks(packs) // formats the packs to give a count of each pack
 
+	// Ensure formattedPacks is a map
+	var jsonPacks map[string]int
+	if err := json.Unmarshal([]byte(formattedPacks), &jsonPacks); err != nil {
+		http.Error(w, "Failed to parse formatted packs", http.StatusInternalServerError)
+		return
+	}
+
 	// Set security headers
 	w.Header().Set("X-Frame-Options", "DENY")
 	w.Header().Set("Content-Security-Policy", "default-src 'self'; script-src 'self'; style-src 'self'; object-src 'none'")
@@ -48,7 +55,7 @@ func (h *CalculateHandlerV1) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Allow", "POST")
 	w.Header().Set("Content-Type", "application/json")
 
-	if err := json.NewEncoder(w).Encode(formattedPacks); err != nil {
+	if err := json.NewEncoder(w).Encode(jsonPacks); err != nil {
 		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
 	}
 }
