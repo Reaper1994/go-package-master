@@ -48,12 +48,7 @@ Request Body:
 ```
 Response:
 ```json
-[
-  {"size": 5000},
-  {"size": 5000},
-  {"size": 2000},
-  {"size": 250}
-]
+{"2000":1,"250":1,"5000":2}
 ```
 Testing
 Run unit and feature tests using:
@@ -79,12 +74,7 @@ curl -X POST http://localhost:8080/api/v1/calculate \
 Expected response:
 
 ```json
-[
-  {"size": 5000},
-  {"size": 5000},
-  {"size": 2000},
-  {"size": 250}
-]
+{"2000":1,"250":1,"5000":2}
 ```
 
 ## Considerations
