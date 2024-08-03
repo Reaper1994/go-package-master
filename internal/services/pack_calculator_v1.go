@@ -41,42 +41,38 @@ func (pc *PackCalculatorV1) CalculatePacks(order models.Order) []models.Pack {
 		}
 	}
 
-	// Optimization: Consolidate results to avoid unnecessary packs
-	res = optimizePacks(res, pc.Packs)
-
-	return res
+	// Optimize the result to minimize the number of packs used
+	return optimizePacks(res, pc.Packs)
 }
 
 // optimizePacks ensures that the final result has the minimal number of packs
 func optimizePacks(packs []models.Pack, availablePacks []models.Pack) []models.Pack {
+	// Create a map of pack sizes to quickly look up if a combined size exists
+	availablePackSizes := make(map[int]models.Pack)
+	for _, pack := range availablePacks {
+		availablePackSizes[pack.Size] = pack
+	}
 
-	for {
-		consolidated := false
-		sort.Slice(packs, func(i, j int) bool {
-			return packs[i].Size > packs[j].Size
-		})
-		for i := 0; i < len(packs)-1; i++ {
-			for j := i + 1; j < len(packs); j++ {
-				combinedSize := packs[i].Size + packs[j].Size
-				for _, availablePack := range availablePacks {
-					if combinedSize == availablePack.Size {
-						packs[i] = availablePack
-						packs = append(packs[:j], packs[j+1:]...)
-						consolidated = true
-						break
-					}
-				}
-				if consolidated {
-					break
-				}
-			}
-			if consolidated {
+	// Sort packs in descending order to prioritize larger packs for consolidation
+	sort.Slice(packs, func(i, j int) bool {
+		return packs[i].Size > packs[j].Size
+	})
+
+	var consolidated []models.Pack
+	for i := 0; i < len(packs); i++ {
+		consolidated = append(consolidated, packs[i])
+	}
+
+	for i := 0; i < len(consolidated)-1; i++ {
+		for j := i + 1; j < len(consolidated); j++ {
+			combinedSize := consolidated[i].Size + consolidated[j].Size
+			if newPack, exists := availablePackSizes[combinedSize]; exists {
+				consolidated[i] = newPack
+				consolidated = append(consolidated[:j], consolidated[j+1:]...)
 				break
 			}
 		}
-		if !consolidated {
-			break
-		}
 	}
-	return packs
+
+	return consolidated
 }

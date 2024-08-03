@@ -54,5 +54,5 @@ func main() {
 	http.Handle("/api/v1/calculate", initializeMiddleware(handlerV1))
 
 	fmt.Printf("PackMaster server is running on port %d\n", Port)
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", Port), nil)) //logs every request
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", Port), nil))
 }
