@@ -12,8 +12,6 @@ type PackCalculatorV1 struct {
 }
 
 // SortAndCachePacks sorts the Packs slice in descending order and stores the result.
-// Cache in the sense refers to storing the sorted version of the Packs slice in a separate field (SortedPacks)
-// within the PackCalculatorV1 struct
 func (pc *PackCalculatorV1) SortAndCachePacks() {
 	// Copy the original packs to avoid modifying the original order
 	pc.SortedPacks = make([]models.Pack, len(pc.Packs))
@@ -33,6 +31,19 @@ func (pc *PackCalculatorV1) CalculatePacks(order models.Order) []models.Pack {
 	remaining := order.Items
 	var res []models.Pack
 
+	var orderLargePacks []models.Pack
+
+	largestPackSize := pc.SortedPacks[0].Size
+	quotient := remaining / largestPackSize
+	remainder := remaining % largestPackSize
+
+	// Add the required number of largest packs to the result
+	for i := 0; i < quotient; i++ {
+		orderLargePacks = append(orderLargePacks, models.Pack{Size: largestPackSize})
+	}
+	remaining = remainder
+
+	// Packing the remaining items with the next available packs
 	for remaining > 0 {
 		packAdded := false
 
@@ -54,22 +65,22 @@ func (pc *PackCalculatorV1) CalculatePacks(order models.Order) []models.Pack {
 		}
 	}
 
-	// Optimize the result to minimize the number of packs used
-	return optimizePacks(res, pc.SortedPacks)
+	// Append the optimized smaller packs to the result
+	result := append(orderLargePacks, optimizePacks(res, pc.SortedPacks)...)
+
+	return result
 }
 
 // optimizePacks ensures that the final result has the minimal number of packs
 func optimizePacks(packs []models.Pack, sortedPacks []models.Pack) []models.Pack {
-
-	// Create a map of pack sizes to quickly look up if a combined size exists
 	availablePackSizes := make(map[int]models.Pack)
 	for _, pack := range sortedPacks {
 		availablePackSizes[pack.Size] = pack
 	}
 
 	var consolidated []models.Pack
-	for i := 0; i < len(packs); i++ {
-		consolidated = append(consolidated, packs[i])
+	for _, pack := range packs {
+		consolidated = append(consolidated, pack)
 	}
 
 	for i := 0; i < len(consolidated)-1; i++ {
