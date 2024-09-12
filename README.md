@@ -3,17 +3,15 @@ A modular Go application that calculates the optimal combination of packs to ful
 
 ## Installation
 
-1. Clone the repository:
-
 ```sh
 cd go-package-master
 ```
-2. Install Dependencies
+1. Install Dependences
 ```sh
 go mod tidy
 ```
 
-3. Update the config.json file if necessary to adjust pack sizes.
+2. Update the config.json file if necessary to adjust pack sizes.
    sample config.json
 ```json
   {
@@ -26,7 +24,7 @@ go mod tidy
       ]
   }
 ```
-4. Running the Application
+3. Running the Application
 Start the application by running:
 
 ```sh
