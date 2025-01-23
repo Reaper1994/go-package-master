@@ -1,6 +1,6 @@
 # Use the official Golang image with Alpine Linux as the base image for building the application.
 # Alpine Linux provides a smaller footprint compared to the standard Golang image.
-FROM golang:1.23.3-alpine
+FROM golang:1.24rc2-alpine
 
 # Set the working directory inside the container to /app.
 # All subsequent commands will be run from this directory.
